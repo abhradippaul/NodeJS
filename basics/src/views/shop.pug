@@ -1,0 +1,26 @@
+doctype html
+html(lang="en")
+    head
+        meta(charset="UTF-8")
+        meta(name="viewport", content="width=device-width, initial-scale=1.0")
+        title Shop
+        link(rel="stylesheet", href="/css/main.css")
+    body
+        header
+            nav
+                ul
+                    li
+                        a(href="/") Shop
+                    li
+                        a(href="/admin/add-product") Add Product
+        main
+            h1 My Products
+            .product-list
+                if products.length > 0
+                    each product in products
+                        article.product-item
+                            h2 #{product.title}
+                            p A very interesting book about many things!
+                            button Add to Cart
+                else
+                    h1 No Products Found
