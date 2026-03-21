@@ -16,10 +16,14 @@
   "devDependencies": {
     "@types/express": "^5.0.6",
     "@types/node": "^25.3.5",
+    "drizzle-kit": "^0.31.10",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3"
   },
   "dependencies": {
+    "@neondatabase/serverless": "^1.0.2",
+    "dotenv": "^17.3.1",
+    "drizzle-orm": "^0.45.1",
     "express": "^5.2.1",
     "pug": "^3.0.3"
   }
