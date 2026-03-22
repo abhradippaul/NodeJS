@@ -1,45 +1,108 @@
 import type { Request, Response } from "express";
-import { AppDataSource } from "../config/data-source.js";
-import { User } from "../schema/user.entity.js";
+import { logger } from "../utils/pino.js";
+import { db } from "../db/index.js";
+import { user, post } from "../db/schema.js";
+import { eq } from "drizzle-orm";
+import { getRedisValue, setRedisValue } from "../utils/redis.js";
 
 export const createUser = async (req: Request, res: Response) => {
     try {
-        const { firstName, lastName, age } = req.body;
-
-        if (!firstName || !lastName || age === undefined) {
-            res.status(400).json({
-                message: "firstName, lastName and age are required",
+        const { name, age, email } = req.body;
+        if (!name || !email || age === undefined) {
+            return res.status(400).json({
+                message: "name, age, and email are required",
+                data: null,
+                error: "Missing required fields"
             });
-            return;
+        }
+        if (typeof age !== 'number' && isNaN(Number(age))) {
+            return res.status(400).json({
+                message: "age must be a number",
+                data: null,
+                error: "Invalid age type"
+            });
+        }
+        const [isExist] = await db.select({ id: user.id }).from(user).where(eq(user.email, email))
+
+        if (isExist?.id) {
+            return res.status(400).json({
+                message: "User already exists",
+                data: null,
+                error: "Duplicate user"
+            });
         }
 
-        const userRepository = AppDataSource.getRepository(User);
-        const user = userRepository.create({
-            firstName: String(firstName),
-            lastName: String(lastName),
+        const [createdUser] = await db.insert(user).values({
+            name,
             age: Number(age),
+            email,
+        }).returning();
+        return res.status(201).json({
+            message: "User created successfully",
+            data: createdUser,
+            error: null
         });
-
-        if (Number.isNaN(user.age)) {
-            res.status(400).json({ message: "age must be a number" });
-            return;
+    } catch (error: any) {
+        if (error?.message?.includes('duplicate key')) {
+            return res.status(409).json({
+                message: "Email already exists",
+                data: null,
+                error: error.message || error
+            });
         }
-
-        const savedUser = await userRepository.save(user);
-        res.status(201).json(savedUser);
-    } catch (error) {
-        console.error("Failed to create user", error);
-        res.status(500).json({ message: "Failed to create user" });
+        logger.error({ err: error }, "Failed to create user");
+        return res.status(500).json({
+            message: "Failed to create user",
+            data: null,
+            error: error.message || error
+        });
     }
 };
 
 export const getUsers = async (_req: Request, res: Response) => {
     try {
-        const userRepository = AppDataSource.getRepository(User);
-        const users = await userRepository.find();
-        res.json(users);
+        const isCached = await getRedisValue("users")
+
+        if (isCached) {
+            logger.info("Cache HIT")
+            return res.json({
+                message: "Users fetched successfully",
+                data: JSON.parse(isCached),
+                error: null
+            });
+        }
+
+        logger.info("Cache MISS")
+        const rows = await db.select().from(user).leftJoin(post, eq(user.id, post.userId))
+        const result = Object.values(
+            rows.reduce((acc, row) => {
+                const id = row.users.id;
+
+                if (!acc[id]) {
+                    acc[id] = { ...row.users, posts: [] };
+                }
+
+                if (row.posts) {
+                    acc[id].posts.push(row.posts);
+                }
+
+                return acc;
+            }, {} as Record<string, any>)
+        );
+
+        await setRedisValue("users", JSON.stringify(result), 60)
+
+        return res.json({
+            message: "Users fetched successfully",
+            data: result,
+            error: null
+        });
     } catch (error) {
-        console.error("Failed to fetch users", error);
-        res.status(500).json({ message: "Failed to fetch users" });
+        logger.error({ err: error }, "Failed to fetch users");
+        return res.status(500).json({
+            message: "Failed to fetch users",
+            data: null,
+            error: error
+        });
     }
 };
