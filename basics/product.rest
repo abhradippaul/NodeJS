@@ -1,5 +1,18 @@
-### Save a new product
-POST http://localhost:8000/posts/create-post
+### Create a user
+POST http://localhost:8000/users
+Content-Type: application/json
+
+{
+  "name": "Abhra Doe",
+  "age": 30,
+  "email": "abhra@example.com"
+}
+
+### Get all users
+GET http://localhost:8000/users
+
+### Create a post
+POST http://localhost:8000/posts
 Content-Type: application/json
 
 {
@@ -8,18 +21,5 @@ Content-Type: application/json
   "userId": "657a6aaf-e249-4888-80ba-ebf4ab376183"
 }
 
-### Get all products
-GET http://localhost:8000/posts/get-posts
-
-### Save a new user
-POST http://localhost:8000/users
-Content-Type: application/json
-
-{
-  "name": "John Doe",
-  "age": 30,
-  "email": "john@example.com"
-}
-
-### Get all users
-GET http://localhost:8000/users
+### Get all posts
+GET http://localhost:8000/posts
