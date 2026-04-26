@@ -1,0 +1,61 @@
+{
+  "info": {
+    "_postman_id": "ca1c1b1b-ac3f-44eb-b2f8-19970b7a481c",
+    "name": "API Architectures",
+    "description": "Collection for testing /rest/items endpoints",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "33445786"
+  },
+  "item": [
+    {
+      "name": "REST",
+      "item": [
+        {
+          "name": "REST - Create Item",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Sample REST Item\",\n  \"description\": \"A test rest item.\",\n  \"price\": 19.99,\n  \"category\": \"Electronics\",\n  \"inStock\": true,\n  \"tags\": [\"gadget\", \"tech\"]\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/rest/items",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "rest",
+                "items"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "REST - Get All Items",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/rest/items",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "rest",
+                "items"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
