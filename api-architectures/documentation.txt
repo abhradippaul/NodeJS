@@ -1,0 +1,45 @@
+# Project: api-architectures
+# Description: A Node.js application demonstrating REST and GraphQL API architectures.
+
+## Main Technologies
+- Express.js: Web framework for the REST API.
+- Apollo Server: GraphQL server implementation.
+- Mongoose: MongoDB object modeling tool.
+- TypeScript: Typed superset of JavaScript.
+- Pino: High-performance logging library.
+- Zod: TypeScript-first schema declaration and validation.
+
+## API Structure
+
+### REST API (Prefix: /rest)
+- GET /: Returns a welcome message.
+- GET /rest/items: Retrieves a list of items.
+- POST /rest/items: Creates a new item (validated against the item schema).
+
+### GraphQL API
+The GraphQL server is running (defaulting to a standalone server in the current configuration).
+- Queries:
+  - items: [Item] - Fetch all items.
+  - item(id: String!): Item - Fetch a specific item by ID.
+  - orders: [Order] - Fetch all orders.
+
+## Project Structure
+- src/index.ts: Entry point of the application.
+- src/controllers/: Contains the logic for REST endpoints.
+- src/db/: Database connection setup.
+- src/middlewares/: Custom Express middlewares (e.g., validation).
+- src/models/: Mongoose models (Item, Order).
+- src/routes/: Express route definitions.
+- src/schema/: GraphQL type definitions.
+- src/utils/: Utility functions (e.g., logger).
+- src/validators/: Zod validation schemas.
+
+## Scripts
+- npm run dev: Starts the development server with tsx watch.
+- npm run build: Compiles TypeScript to JavaScript.
+- npm run start: Runs the compiled application.
+
+## Development Setup
+1. Install dependencies: pnpm install
+2. Set up environment variables in a .env file (e.g., PORT, MONGODB_URI).
+3. Run the development server: npm run dev
